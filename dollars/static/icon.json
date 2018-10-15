@@ -1,0 +1,31 @@
+{
+  "images": [
+    {
+      "src": "/static/icon_1.png"
+    },
+    {
+      "src": "/static/icon_2.png"
+    },
+    {
+      "src": "/static/icon_3.png"
+    },
+    {
+      "src": "/static/icon_4.png"
+    },
+    {
+      "src": "/static/icon_5.png"
+    },
+    {
+      "src": "/static/icon_6.png"
+    },
+    {
+      "src": "/static/icon_7.png"
+    },
+    {
+      "src": "/static/icon_8.png"
+    },
+    {
+      "src": "/static/icon_9.png"
+    }
+  ]
+}

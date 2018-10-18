@@ -8,9 +8,14 @@
       <div class="dialog-group">
         <ul class="dialog-item" ref="dialogItem">
           <li class="message" v-for="(message, index) in messages" v-bind:key="index">
-            <span id="user-info" class="user-info" v-show="message.user"><div class="userIcon"><img :src="userImage(message)"></div><label class="user-name" for="user-info">{{message.user}}</label></span>
+            <span id="user-info" class="user-info" v-show="message.user">
+              <div class="userIcon">
+                <img :src="userImage(message)">
+              </div>
+              <label class="user-name" for="user-info">{{message.user}}</label>
+            </span>
             <transition name="bounce">
-              <span v-if="index != 0 || showDelay || !message.user" :class="userMessage(message, index)">{{message.message}}</span>
+              <span v-if="index != 0 || showDelay || !message.user" :class="userMessage(message, index)"><strong>{{message.message}}</strong></span>
             </transition>
           </li>
         </ul>
@@ -22,6 +27,16 @@
           <div class="icon-container">
             <img :src="icon.src">
           </div>
+        </li>
+      </ul>
+      <ul class="connecters">
+        <li v-for="(connecter, index) in connecters" v-bind:key="index">
+          <span id="user-info" class="user-info">
+              <div class="userIcon">
+                <img :src="userImage(connecter)">
+              </div>
+              <label class="user-name" for="user-info">{{connecter.user}}</label>
+            </span>
         </li>
       </ul>
     </div>
@@ -39,7 +54,9 @@ export default {
       postMessage: '',
       messages: [],
       iconGroup: icon.images,
-      showDelay: true
+      showDelay: true,
+      socket: '',
+      connecters: []
     }
   },
   computed: {
@@ -68,22 +85,33 @@ export default {
     //消息出现动画效果
     changeShow() {
       this.showDelay = true
+    },
+    logout () {
+      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('userIcon')
     }
   },
+  created () {
+    // 读取聊天记录
+  },
   mounted () {
+    
     // 保留用户名
-    const socket = io.connect('ws://127.0.0.1:3000/')
+    this.socket = io.connect('ws://127.0.0.1:3000/')
+    
     this.username = sessionStorage.username
+    this.userIcon = sessionStorage.userIcon
     //发送进入信息
-    socket.emit('login', {
-      username: this.username
+    this.socket.emit('login', {
+      username: this.username,
+      userIcon: this.userIcon
     })
     //websocket服务
-    socket.on('connectStatus',data => {
+    this.socket.on('connectStatus',data => {
       console.log(data)
     })
     // 收到新消息
-    socket.on('getMessage',data => {
+    this.socket.on('getMessage',data => {
       if(typeof data === 'string') {
         this.messages.unshift({
           message: `>>>${data}`
@@ -99,15 +127,32 @@ export default {
         'message': this.postMessage,
         'userIcon': this.userIcon
       }
-      socket.emit('newMessage', parms)
+      this.socket.emit('newMessage', parms)
       this.postMessage = ''
     })
+    // 更新参与者
+    this.socket.on('connecter', data => {
+      this.connecters = data
+    })
+    //离开页面logout
+    window.onunload = () => {
+      this.socket.emit('logout', {
+      username: this.username
+      })
+    }
   },
   watch: {
     messages () {
       this.showDelay = false
       var timer = setTimeout(this.changeShow, 50)
+    },
+    $route(to, from) {
+      this.logout()
     }
+
+  },
+  destroyed() {
+    
   }
 }
 </script>
@@ -172,7 +217,7 @@ export default {
 }
 .user-message {
   margin: 0.6rem 1.2rem 1.2rem 1.2rem;
-  padding: 1rem 1.2rem 1rem 1.2rem;
+  padding: 1.2rem 1.2rem 1rem 1.2rem;
   border: .3125rem solid white;
   background-image:linear-gradient(rgb(105, 221, 247) 0px, rgb(93, 210, 237) 50%, rgb(1, 188, 228) 51%, rgb(4, 185, 226) 100%);
   border-radius: 1.5rem;
@@ -189,8 +234,17 @@ export default {
 .entering {
   margin-left: 6.25rem;
 }
+.connecters {
+  width: 25rem;
+}
+.connecters li{
+  display: inline-block;
+  margin: 10px;
+}
 .icon-select {
   width: 25rem;
+  height: 0;
+  overflow: hidden;
 }
 .icon-select li {
   list-style-type: none;
@@ -235,5 +289,8 @@ export default {
   100% {
     transform: scale(1);
   }
+}
+.connecters li{
+  color: white;
 }
 </style>

@@ -20,14 +20,16 @@ export default {
   name: 'loginPage',
   data () {
     return {
-      username: ''
+      username: '',
+      userIcon: 0
     }
   },
   methods: {
     // 本地测试
     login () {
-      this.$store.commit('userLogin', this.username)
+      this.userIcon = Math.floor(Math.random() * 9)
       sessionStorage.setItem('username', this.username)
+      sessionStorage.setItem('userIcon', this.userIcon)
     }
   },
   mounted () {

@@ -87,6 +87,9 @@ export default {
       this.showDelay = true
     },
     logout () {
+      this.socket.emit('logout', {
+        username: this.username
+      })
       sessionStorage.removeItem('username')
       sessionStorage.removeItem('userIcon')
     }
@@ -96,16 +99,24 @@ export default {
   },
   mounted () {
     
+    // 判断刷新 
+    if(!sessionStorage.username) {
+      this.$router.push('/')      
+    }
+    
     // 保留用户名
     this.socket = io.connect('ws://127.0.0.1:3000/')
     
     this.username = sessionStorage.username
     this.userIcon = sessionStorage.userIcon
     //发送进入信息
-    this.socket.emit('login', {
-      username: this.username,
-      userIcon: this.userIcon
-    })
+    if (this.username) {
+      this.socket.emit('login', {
+        username: this.username,
+        userIcon: this.userIcon
+      })
+    }
+    
     //websocket服务
     this.socket.on('connectStatus',data => {
       console.log(data)
@@ -130,29 +141,28 @@ export default {
       this.socket.emit('newMessage', parms)
       this.postMessage = ''
     })
+    // 未登录警告
+    // this.socket.on('undefinedUser',data => {
+    //   window.alert(data)
+    //   // this.$router.push('/')
+    // })
     // 更新参与者
     this.socket.on('connecter', data => {
       this.connecters = data
     })
-    //离开页面logout
-    window.onunload = () => {
-      this.socket.emit('logout', {
-      username: this.username
-      })
-    }
+    // 监听离开页面
+    window.addEventListener('beforeunload', () => {
+      this.logout()
+    })
   },
   watch: {
     messages () {
       this.showDelay = false
       var timer = setTimeout(this.changeShow, 50)
-    },
-    $route(to, from) {
-      this.logout()
     }
-
   },
   destroyed() {
-    
+    this.logout()
   }
 }
 </script>

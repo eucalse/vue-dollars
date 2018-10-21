@@ -15,15 +15,24 @@ app.get('/', function (req, res) {
 io.on('connection', function (socket) {
   //接受用户名
   socket.on('login', data => {
-    let username = data.username
-    let userIcon = data.userIcon
-    connecter.push({
-      user: username,
-      userIcon: userIcon
-    })
-    console.log(connecter)
-    io.sockets.emit('getMessage',`${username}进入聊天室`)
-    io.sockets.emit('connecter', connecter)
+    if (data.username) {
+      let username = data.username
+      let userIcon = data.userIcon
+      // 刷新不重新登录
+      if (connecter.indexOf(username)) {
+        
+      }
+      connecter.push({
+        user: username,
+        userIcon: userIcon
+      })
+      console.log(connecter)
+      io.sockets.emit('getMessage',`${username}进入聊天室`)
+      io.sockets.emit('connecter', connecter)
+    }
+    // else if(data.user == 'undefined') {
+    //   socket.emit('undefinedUser', '请先登录')
+    // }
   })
   // 广播退出聊天室
   socket.on('logout',data => {
@@ -33,9 +42,10 @@ io.on('connection', function (socket) {
         connecter.splice(i,1)
       }
     }
-    console.log(connecter)
-    io.sockets.emit('getMessage',`${username}离开了聊天室`)
-    io.sockets.emit('connecter', connecter)
+    if (username) {
+      io.sockets.emit('getMessage',`${username}离开了聊天室`)
+      io.sockets.emit('connecter', connecter)
+    }
   })
   // 通知连接成功
   socket.broadcast.emit('')

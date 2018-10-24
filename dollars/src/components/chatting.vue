@@ -2,7 +2,7 @@
   <div id="chatting">
     <div class="chatting-area">
       <div class="post">
-        <textarea class="postBlank" placeholder="Type in here" v-model="postMessage"></textarea>
+        <textarea class="postBlank" placeholder="Type in here" v-model="postMessage" @keyup.enter="sendMessage()"></textarea>
         <button ref="post"><strong>POST</strong></button>
       </div>
       <div class="dialog-group">
@@ -49,26 +49,26 @@ import icon from '../../static/icon.json'
 export default {
   data () {
     return {
-      username: '',
-      userIcon: 0,
-      postMessage: '',
-      messages: [],
-      iconGroup: icon.images,
-      showDelay: true,
-      socket: '',
-      connecters: []
+      username: '', //当前用户名
+      userIcon: 0,  // 头像编号
+      postMessage: '', // 消息内容
+      messages: [], // 消息列表
+      iconGroup: icon.images, // 头像列表
+      showDelay: true,  // 锁定第一条消息的动画显示
+      socket: '', // websocket
+      connecters: []  // 参与者列表
     }
   },
   computed: {
     
   },
   methods: {
+    // 
     userImage (message) {
       let val = message.userIcon
       if (val || val === 0) {
         return icon.images[val].src
       }
-       
     },
     // 对话框样式变更
     userMessage (message, index) {
@@ -86,53 +86,16 @@ export default {
     changeShow() {
       this.showDelay = true
     },
+    // 用户登出
     logout () {
       this.socket.emit('logout', {
         username: this.username
       })
       sessionStorage.removeItem('username')
       sessionStorage.removeItem('userIcon')
-    }
-  },
-  created () {
-    // 读取聊天记录
-  },
-  mounted () {
-    
-    // 判断刷新 
-    if(!sessionStorage.username) {
-      this.$router.push('/')      
-    }
-    
-    // 保留用户名
-    this.socket = io.connect('ws://127.0.0.1:3000/')
-    
-    this.username = sessionStorage.username
-    this.userIcon = sessionStorage.userIcon
-    //发送进入信息
-    if (this.username) {
-      this.socket.emit('login', {
-        username: this.username,
-        userIcon: this.userIcon
-      })
-    }
-    
-    //websocket服务
-    this.socket.on('connectStatus',data => {
-      console.log(data)
-    })
-    // 收到新消息
-    this.socket.on('getMessage',data => {
-      if(typeof data === 'string') {
-        this.messages.unshift({
-          message: `>>>${data}`
-        })
-      } else {
-        this.messages.unshift(data)
-      }
-    })
-    //注册post点击事件
-    this.$refs.post.addEventListener('click', () => {
+    },
+    // 发送消息
+    sendMessage () {
       let parms = {
         'user': this.username,
         'message': this.postMessage,
@@ -140,22 +103,58 @@ export default {
       }
       this.socket.emit('newMessage', parms)
       this.postMessage = ''
-    })
-    // 未登录警告
-    // this.socket.on('undefinedUser',data => {
-    //   window.alert(data)
-    //   // this.$router.push('/')
-    // })
-    // 更新参与者
-    this.socket.on('connecter', data => {
-      this.connecters = data
-    })
+    },
+    socketIo() {
+      // 保留用户名
+      this.socket = io.connect('ws://127.0.0.1:3000/')
+      //发送进入信息
+      if (this.username) {
+        this.socket.emit('login', {
+          username: this.username,
+          userIcon: this.userIcon
+        })
+      }     
+      //websocket服务状态
+      this.socket.on('connectStatus',data => {
+        console.log(data)
+      })
+      // 收到新消息
+      this.socket.on('getMessage',data => {
+        if(typeof data === 'string') {
+          this.messages.unshift({
+            message: `>>>${data}`
+          })
+        } else {
+          this.messages.unshift(data)
+        }
+      })
+      //发送消息
+      this.$refs.post.addEventListener('click', this.sendMessage)
+
+      // 更新参与者
+      this.socket.on('connecter', data => {
+        this.connecters = data
+      })
+    }
+  },
+  created () {
+    // 读取聊天记录
+  },
+  mounted () {
+    this.username = sessionStorage.username
+    this.userIcon = sessionStorage.userIcon
+    this.socketIo()
+    // 未登录用户跳转回主页
+    if(!sessionStorage.username) {
+      this.$router.push('/')      
+    }
     // 监听离开页面
     window.addEventListener('beforeunload', () => {
       this.logout()
     })
   },
   watch: {
+    // 对首条信息的transition进行修改
     messages () {
       this.showDelay = false
       var timer = setTimeout(this.changeShow, 50)

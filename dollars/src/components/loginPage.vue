@@ -6,10 +6,8 @@
       </div>
       <div class="dollars-user">
         <span><strong style="color: white">USERNAME:</strong></span>
-        <input class="username-input" type="text" v-model="username">
-        <router-link to="/chatting">
-          <button type="button" class="login-button" ref="submit"><strong style="color:white">ENTER</strong></button>
-        </router-link>
+        <input class="username-input" type="text" v-model="username" @keyup.enter="login()">
+        <button type="button" class="login-button" ref="submit"><strong style="color:white">ENTER</strong></button>
       </div>
     </div>
   </div>
@@ -27,9 +25,14 @@ export default {
   methods: {
     // 本地测试
     login () {
+      if (!this.username.trim()) {
+        alert('请输入用户名')
+        return
+      }
       this.userIcon = Math.floor(Math.random() * 9)
       sessionStorage.setItem('username', this.username)
       sessionStorage.setItem('userIcon', this.userIcon)
+      this.$router.push('/chatting')
     }
   },
   mounted () {

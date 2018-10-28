@@ -46,20 +46,45 @@ export default {
   margin: 0;
   padding: 0;
 }
+@media screen and (max-width: 25rem ) {
+  #loginPage {
+    transform: scale(0.6)
+  }
+}
+@media screen and (max-width: 31.25rem) and (min-width: 25rem) {
+  #loginPage {
+    transform: scale(0.7)
+  }
+  .dollars-login {
+    width: 25rem;
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+}
+@media screen and (min-width: 31.25rem) {
+  .dollars-login {
+    width: 25rem;
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+  .main-img {
+    top: 6.25rem;
+  }
+}
+
+#loginPage {
+  height: 100%;
+}
 #app {
   background-color: #0a0a0a;
 }
-.dollars-login {
-  width: 25rem;
-  height: 100%;
-  margin: 0 auto;
-  position: relative;
-}
+
 .main-img {
   position: absolute;
   width: 100%;
   height: 25rem;
-  top: 6.25rem;
 }
 .dollars-user{
   position: absolute;

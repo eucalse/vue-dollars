@@ -167,31 +167,90 @@ export default {
 </script>
 
 <style>
+/* 400px以下屏幕 */
+@media screen and (max-width: 25rem) {
+  .chatting-area {
+    width: 100%;
+  }
+  .post textarea {
+    width: 70%;
+    height: 5rem;
+    top: 2rem;
+    position: absolute;
+  }
+  .chatting-config {
+    display: none;
+  }
+  .dialog-group {
+    width: 90%;
+  }
+  .user-message {
+    max-width: 7rem;
+  }
+  .post {
+    height: 10rem;
+  }
+}
+@media screen and (min-width: 25rem) and (max-width: 37.5rem) {
+  .chatting-area {
+    width: 100%;
+  }
+  .post textarea {
+    width: 70%;
+    height: 5rem;
+    top: 2rem;
+    position: absolute;
+  }
+  .chatting-config {
+    display: none;
+  }
+  .dialog-group {
+    width: 90%;
+  }
+  .user-message {
+    max-width: 15rem;
+  }
+  .post {
+    height: 10rem;
+  }
+}
+@media screen and (min-width: 37.5rem) {
+  .chatting-area {
+    flex: 1;
+    border-right: 10px solid white;
+  }
+  .post textarea {
+    width: 70%;
+    height: 6.25rem;
+    top: 3rem;
+  }
+  .dialog-group {
+    width: 60rem;
+  }
+  .post {
+    height: 12.5rem;
+  }
+}
+.chatting-area {
+    display: flex;
+    flex-direction: column;
+}
 #chatting {
   display: flex;
   flex-direction: row;
   height: 100%;
 }
-.chatting-area {
-  flex: 1;
-  border-right: 10px solid white;
-  display: flex;
-  flex-direction: column;
-}
+
 .chatting-config {
-  width: 25rem;
+  width: 20rem;
 }
 .post {
-  height: 12.5rem;
   background-color: #bbbbbb;
   position: relative;
 }
 .post textarea {
-  width: 40rem;
-  height: 6.25rem;
   position: absolute;
   left: 50%;
-  top: 3rem;
   transform: translateX(-50%);
   resize: none;
 }
@@ -205,7 +264,6 @@ export default {
 }
 .dialog-group {
   flex: 1;
-  width: 50rem;
   margin: 0 auto;
   padding-top: .9375rem;
   overflow: auto;
@@ -220,11 +278,12 @@ export default {
 }
 .user-info {
   display: inline-block;
-  width: 80px;
-  height: 100px;
+  width: 5rem;
+  height: 6.25rem;
   position: relative;
 }
 .user-message {
+  /* flex: 1; */
   margin: 0.6rem 1.2rem 1.2rem 1.2rem;
   padding: 1.2rem 1.2rem 1rem 1.2rem;
   border: .3125rem solid white;
@@ -244,7 +303,7 @@ export default {
   margin-left: 6.25rem;
 }
 .connecters {
-  width: 25rem;
+  width: 100%;
 }
 .connecters li{
   display: inline-block;

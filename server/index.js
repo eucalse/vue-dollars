@@ -9,7 +9,7 @@ server.listen(3000, () =>{
 });
 
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
+  res.sendfile(__dirname + '/public/index.html');
 });
 
 io.on('connection', function (socket) {
@@ -55,7 +55,7 @@ io.on('connection', function (socket) {
     io.sockets.emit('getMessage', data)
   })
   socket.on('disconnect', data => {
-
+    // return 
   })
 });
 

@@ -3,7 +3,12 @@
     <div class="chatting-area">
       <div class="post">
         <textarea class="postBlank" placeholder="Type in here" v-model="postMessage" @keyup.enter="sendMessage()"></textarea>
-        <button ref="post"><strong>POST</strong></button>
+        <button class="imgUpdate" style="display: inline-block; overflow:hidden;">
+          <span>上传</span>
+          <input ref="imageSelect" style="position: absolute; right:0px; top: 0px;opacity: 0;-ms-filter:'alpha(opacity=0)'" type="file" accept="image/png,image/jpeg/,image/jpg" @change="imgLoading">
+        </button>
+        <span v-if="imgUpdateSrc"><img :src="imgUpdateSrc"></span>
+        <button class="post-btn" ref="post"><strong>POST</strong></button>
       </div>
       <div class="dialog-group">
         <ul class="dialog-item" ref="dialogItem">
@@ -56,6 +61,7 @@ export default {
       iconGroup: icon.images, // 头像列表
       showDelay: true,  // 锁定第一条消息的动画显示
       socket: '', // websocket
+      imgUpdateSrc: '',
       connecters: []  // 参与者列表
     }
   },
@@ -135,6 +141,10 @@ export default {
       this.socket.on('connecter', data => {
         this.connecters = data
       })
+    },
+    imgLoading() {
+      // console.log(this.$refs.imageSelect.value)
+      // this.imgUpdateSrc += this.$refs.imageSelect.value
     }
   },
   created () {
@@ -231,6 +241,11 @@ export default {
     height: 12.5rem;
   }
 }
+.imgUpdate {
+  position: absolute;
+  top: 3.25rem;
+  left: 6.25rem;
+}
 .chatting-area {
     display: flex;
     flex-direction: column;
@@ -254,7 +269,7 @@ export default {
   transform: translateX(-50%);
   resize: none;
 }
-.post button {
+.post-btn {
   width: 10rem;
   height: 1.875rem;
   position: absolute;
